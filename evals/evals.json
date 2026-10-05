@@ -1,0 +1,65 @@
+{
+  "skill_name": "cyber-security-developer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Scan my system for security issues. It's a Next.js frontend with a FastAPI backend, PostgreSQL, Redis, and a docker-compose file. Just tell me what's wrong, don't change anything.",
+      "expected_output": "Recognizes Mode A (audit, read-only). Runs security_inventory.py first and reads git state. Detects Next.js, FastAPI, PostgreSQL, Redis, and Docker from the inventory. Reviews the areas in security-baseline.md that apply (authz/IDOR/BOLA, auth/JWT, injection traced source-to-sink, XSS, CSRF/CORS, SSRF, secrets, TLS, rate limiting, Docker root/privileged/socket, compose published ports, Redis auth/exposure) and combines manual review with SCA/secret/IaC scanners that are available. Classifies each finding by severity and confidence, validates important ones manually, and dismisses unexploitable scanner output. Makes NO source or config changes. Produces the 15-section report and the verification matrix, redacts any secret values, and ends with the mandated non-absolute conclusion.",
+      "files": [],
+      "assertions": [
+        "Selects Mode A and makes no code or configuration changes",
+        "Runs the inventory script before analysis and inspects git state read-only",
+        "Auto-detects the stack (Next.js, FastAPI, PostgreSQL, Redis, Docker) rather than assuming a fixed framework",
+        "Traces input to sink for injection/XSS/SSRF instead of reporting on keyword matches",
+        "Builds an authorization matrix and checks IDOR/BOLA, backend-enforced authz, and tenant isolation",
+        "Assigns severity and confidence and separates confirmed findings from dismissed scanner output",
+        "Redacts secret values in the report",
+        "Ends with a non-absolute conclusion (never claims 100% or guaranteed secure)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Here is our Spring Boot + Angular app with Terraform for AWS. Give me a security remediation plan for everything you find.",
+      "expected_output": "Recognizes Mode B (audit plus remediation plan, still read-only). Runs the inventory, detects Spring Boot, Angular, and Terraform/AWS. Reviews Spring Security filter-chain ordering and csrf config, Angular bypassSecurityTrust sinks and shipped environment secrets, JWT validation, injection, and Terraform/AWS misconfig (public buckets, 0.0.0.0/0 security groups, unencrypted resources, IAM wildcards, state handling) using tfsec/checkov plus manual review. For each finding provides the exact fix, files/components affected, recommended implementation, priority, expected impact, the security tests to add, and a verification procedure. Does NOT modify any code or run terraform apply. Uses the finding template, severity and confidence scales, redaction, and the full report structure.",
+      "files": [],
+      "assertions": [
+        "Selects Mode B and produces a remediation plan without modifying code",
+        "Detects Spring Boot, Angular, and Terraform/AWS and reviews technology-specific issues",
+        "Uses read-only cloud/IaC inventory and does not run mutating cloud or terraform apply commands",
+        "For each finding gives exact fix, files affected, implementation, priority, impact, tests to add, and verification",
+        "Maps findings to OWASP/ASVS/API/CWE without treating standards as checkboxes",
+        "Does not invent CVSS scores or standard versions",
+        "Redacts secrets and ends with a non-absolute conclusion"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Find and fix the security issues in this Express + MongoDB API and make sure the fixes actually work.",
+      "expected_output": "Recognizes Mode C (audit, fix, verify). Runs the inventory and git state, then before changing anything preserves uncommitted work and creates a reversible checkpoint (branch/worktree/stash). Detects Express and MongoDB. Finds real issues (for example NoSQL operator injection from req.body, missing backend authorization/IDOR, missing rate limiting, weak JWT verification, secrets) tracing input to sink. For each: understands root cause, adds a failing security regression test, implements the smallest correct fix using proper primitives (not verify=False, not ACAO *, not hidden buttons, not disabled tests), runs the focused test and regression tests, re-scans, attempts bypasses and neighboring variants, inspects the diff, and confirms closure with before/after evidence. Holds any production-blast-radius action for approval. Reports files modified, tests added/run, scan before/after, and remaining risk, and ends with the non-absolute conclusion.",
+      "files": [],
+      "assertions": [
+        "Selects Mode C and creates a reversible checkpoint before editing, preserving uncommitted work",
+        "Detects Express and MongoDB and finds NoSQL injection and broken-authorization classes by tracing input to sink",
+        "Treats a fix as incomplete until tested: adds a security regression test and runs it plus regression tests",
+        "Re-scans changed code and attempts bypasses/neighboring variants before declaring closure",
+        "Uses correct fix primitives and never uses banned fixes (verify=False, ACAO *, hiding buttons, disabling security/tests)",
+        "Holds production-blast-radius operations for explicit approval",
+        "Records files modified, tests added/run, and scan before/after with secrets redacted",
+        "Ends with a non-absolute conclusion"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Can you take a look at the security of my project?",
+      "expected_output": "The mode is ambiguous, so defaults to Mode B (audit plus remediation plan) as specified. Runs the inventory to detect the stack generically, performs the read-only assessment, and delivers findings with a remediation plan per finding, without modifying code. May briefly note that it can proceed to actually fix issues (Mode C) if the user wants. Uses the report structure, redaction, and non-absolute conclusion.",
+      "files": [],
+      "assertions": [
+        "Defaults to Mode B when the mode is ambiguous",
+        "Runs the inventory and detects the stack instead of assuming a framework",
+        "Delivers findings plus a remediation plan without changing code",
+        "Offers to proceed to fixing (Mode C) as a next step",
+        "Redacts secrets and ends with a non-absolute conclusion"
+      ]
+    }
+  ]
+}
